@@ -1,17 +1,17 @@
 {% set name = "pytest-bdd" %}
-{% set version = "7.0.0" %}
+{% set version = "8.1.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name.replace('-', '_') }}-{{ version }}.tar.gz
-  sha256: cb11e33b4419bd281cd6f74027c0b1eedeaf8f8d187edc897b4a61ae976ef9f1
+  url: https://github.com/pytest-dev/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 92162b4b92eea7092e07e978b42e552543fe66e4253534567825883cbaf9077b
 
 build:
   number: 0
-  skip: true  # [py<38]
+  skip: true  # [py<39]
   entry_points:
     - pytest-bdd = pytest_bdd.scripts:main
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
@@ -26,10 +26,17 @@ requirements:
     - mako
     - parse
     - parse_type
-    - pytest >=6.2.0
+    - pytest >=7.0.0
     - typing-extensions
+    - packaging
+    - gherkin-official >=29.0.0
 
 test:
+  source_files:
+    - tests
+    - src
+    - pyproject.toml
+    - pytest.ini
   imports:
     - pytest_bdd
   requires:
@@ -37,6 +44,7 @@ test:
   commands:
     - pip check
     - pytest-bdd --help
+    - pytest -v tests
 
 about:
   home: https://github.com/pytest-dev/pytest-bdd
