@@ -29,7 +29,7 @@ requirements:
     - pytest >=7.0.0
     - typing-extensions
     - packaging
-    - gherkin-official >=29.0.0
+    - gherkin-official >=29.0.0,<30.0.0
 
 # These tests generally have problems with paths on Windows
 #E AssertionError: assert 'migrated: C:...\\__init__.py' == 'migrated: C:...s/__init__.py'
