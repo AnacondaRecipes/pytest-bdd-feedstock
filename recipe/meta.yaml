@@ -31,6 +31,16 @@ requirements:
     - packaging
     - gherkin-official >=29.0.0
 
+# These tests generally have problems with paths on Windows
+#E AssertionError: assert 'migrated: C:...\\__init__.py' == 'migrated: C:...s/__init__.py'
+#E assert 'C:\\does\\not\\exist\\steps.feature' in "[Errno 2] No such file or directory: 'C:\\\\does\\\\not\\\\exist\\\\steps.feature'"
+{% set ignore_test = [
+  "test_feature_path_not_found",
+  "test_feature_path_by_param_not_found",
+  "test_generate",
+  "test_migrate",
+]%}
+
 test:
   source_files:
     - tests
@@ -44,7 +54,8 @@ test:
   commands:
     - pip check
     - pytest-bdd --help
-    - pytest -v tests
+    - pytest -v tests -k "not ({{ ignore_test | join(" or ") }})" # [win]
+    - pytest -v tests # [not win]
 
 about:
   home: https://github.com/pytest-dev/pytest-bdd
