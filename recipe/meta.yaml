@@ -20,7 +20,7 @@ requirements:
   host:
     - python
     - pip
-    - uv_build >=0.12.13,<0.13.0
+    - uv-build >=0.12.13,<0.13.0
   run:
     - python
     - mako
