@@ -1,17 +1,8 @@
 {% set name = "pytest-bdd" %}
 {% set version = "9.0.0" %}
-{% set ignore_test = [
-  "test_feature_path_not_found",
-  "test_feature_path_by_param_not_found",
-  "test_generate",
-  "test_migrate"
-] %}
 
-# These tests generally have problems with paths on Windows
-#E AssertionError: assert 'migrated: C:...\\__init__.py' == 'migrated: C:...s/__init__.py'
-#E assert 'C:\\does\\not\\exist\\steps.feature' in "[Errno 2] No such file or directory: 'C:\\\\does\\\\not\\\\exist\\\\steps.feature'"
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
@@ -29,7 +20,6 @@ requirements:
   host:
     - python
     - pip
-    - poetry-core >=1.0.0
     - uv_build >=0.12.13,<0.13.0
   run:
     - python
@@ -40,7 +30,15 @@ requirements:
     - typing-extensions
     - packaging
     - gherkin-official >=29.0.0,!=31.0.0,!=32.0.0
-    - typing_extensions
+
+
+# These tests generally have problems with paths on Windows
+#E AssertionError: assert 'migrated: C:...\\__init__.py' == 'migrated: C:...s/__init__.py'
+#E assert 'C:\\does\\not\\exist\\steps.feature' in "[Errno 2] No such file or directory: 'C:\\\\does\\\\not\\\\exist\\\\steps.feature'"
+{% set disabled_tests = " test_feature_path_not_found" %}
+{% set disabled_tests = disabled_tests+ " or test_feature_path_by_param_not_found" %}
+{% set disabled_tests = disabled_tests+ " or test_generate" %}
+{% set disabled_tests = disabled_tests+ " or test_migrate" %}
 
 test:
   source_files:
@@ -55,11 +53,11 @@ test:
   commands:
     - pip check
     - pytest-bdd --help
-    - pytest -v tests -k "not ({{ ignore_test | join(" or ") }})"  # [win]
-    - pytest -v tests  # [not win]
+    - pytest -vv tests -k "not ({{ disabled_tests }})"  # [win]
+    - pytest -vv tests  # [not win]
 
 about:
-  home: https://github.com/pytest-dev/pytest-bdd
+  home: https://pytest-bdd.readthedocs.io
   license: MIT
   license_family: MIT
   license_file: LICENSE.txt
