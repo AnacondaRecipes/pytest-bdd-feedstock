@@ -1,17 +1,17 @@
 {% set name = "pytest-bdd" %}
-{% set version = "8.1.0" %}
+{% set version = "9.0.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   url: https://github.com/pytest-dev/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 92162b4b92eea7092e07e978b42e552543fe66e4253534567825883cbaf9077b
+  sha256: 55dc98ce68ab16656bd36b7fc585c78e8d155d1d9e2d72a6f2774a53ad6e880e
 
 build:
   number: 0
-  skip: true  # [py<39]
+  skip: true  # [py<310]
   entry_points:
     - pytest-bdd = pytest_bdd.scripts:main
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
@@ -20,7 +20,7 @@ requirements:
   host:
     - python
     - pip
-    - poetry-core >=1.0.0
+    - uv-build >=0.12.13,<0.13.0
   run:
     - python
     - mako
@@ -29,17 +29,16 @@ requirements:
     - pytest >=7.0.0
     - typing-extensions
     - packaging
-    - gherkin-official >=29.0.0,<30.0.0
+    - gherkin-official >=29.0.0,!=31.0.0,!=32.0.0
+
 
 # These tests generally have problems with paths on Windows
 #E AssertionError: assert 'migrated: C:...\\__init__.py' == 'migrated: C:...s/__init__.py'
 #E assert 'C:\\does\\not\\exist\\steps.feature' in "[Errno 2] No such file or directory: 'C:\\\\does\\\\not\\\\exist\\\\steps.feature'"
-{% set ignore_test = [
-  "test_feature_path_not_found",
-  "test_feature_path_by_param_not_found",
-  "test_generate",
-  "test_migrate",
-]%}
+{% set disabled_tests = " test_feature_path_not_found" %}
+{% set disabled_tests = disabled_tests+ " or test_feature_path_by_param_not_found" %}
+{% set disabled_tests = disabled_tests+ " or test_generate" %}
+{% set disabled_tests = disabled_tests+ " or test_migrate" %}
 
 test:
   source_files:
@@ -54,11 +53,11 @@ test:
   commands:
     - pip check
     - pytest-bdd --help
-    - pytest -v tests -k "not ({{ ignore_test | join(" or ") }})" # [win]
-    - pytest -v tests # [not win]
+    - pytest -vv tests -k "not ({{ disabled_tests }})"  # [win]
+    - pytest -vv tests  # [not win]
 
 about:
-  home: https://github.com/pytest-dev/pytest-bdd
+  home: https://pytest-bdd.readthedocs.io
   license: MIT
   license_family: MIT
   license_file: LICENSE.txt
